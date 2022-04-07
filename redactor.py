@@ -394,11 +394,10 @@ def output(args, complete_data, files):
     '''
     if args.output == 'stdout':
         print("\n","******* Redacted data output from ", files,"file","*******","\n",complete_data)
-    elif args.output != 'stderr': 
-        path=files.split('.')
+    elif args.output != 'stderr':
         cwd = os.getcwd()
         folder_path = os.path.join(cwd,str(args.output).strip('\''))
-        path=ntpath.basename(path[0])+ '.redacted'
+        path=ntpath.basename(files)+ '.redacted'
         complete_path = (str(args.output).strip('\'') + '\\' + path)
         final_path = os.path.join(cwd,complete_path)
         if os.path.isdir(folder_path):
