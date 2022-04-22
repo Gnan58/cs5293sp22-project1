@@ -25,12 +25,12 @@ def get_files (args):
     '''
     files = []
     if args.input==[]:
-        print ("There is no file to redact.")
+        print ("There is no file to redact.",file = sys.stderr)
         exit(0)
-    elif str(args.input[0]).strip('\'') == '*.txt':
+    else:
         files = glob.glob(str(args.input[0]).strip('\''))
-    if files is None:
-        print ("There is no text file to redact.")
+    if files == []:
+        print ("There is no text file to redact.",file = sys.stderr)
         exit(0)
     return files
 
@@ -178,7 +178,7 @@ def redact_gender(text):
             gender_list.append(token.text)
     count = len(gender_list)
     for found_gender in gender_list:
-        text = text.replace(str(found_gender), unicode_char(str(found_gender)))
+        text = re.sub(r"\b{}\b".format(found_gender), unicode_char(str(found_gender)), text)
     return text,gender_list,count
 
 def redact_address(text):
@@ -282,7 +282,6 @@ def stats(args, text, file):
         file data after redacting all values.
     '''
     final_data = temp = text
-    print(args.stats,type(args.stats))
     if args.names:
         final_data,names,name_count = redact_names(final_data)
         if args.stats == 'stdout':
@@ -326,6 +325,8 @@ def stats(args, text, file):
         elif args.stats != 'stderr':
             write_tostatfile(concepts,concept_count,file,args)
         #print(final_data,concepts,concept_count, file=sys.stdout)
+    if args.stats == 'stderr':
+        print("No Error Found", file=sys.stderr)
     return final_data
 
 def write_tostatfile(redacted_terms, count, file, args):
@@ -407,7 +408,8 @@ def output(args, complete_data, files):
             final_file = open(final_path, "w" ,encoding="utf-8")
         final_file.write(complete_data)
         final_file.close()
-
+    elif args.output == 'stderr':
+        print("No Error Found", file = sys.stderr)
 def main(parser):
     """
     Command line parsing and redacting everything.
